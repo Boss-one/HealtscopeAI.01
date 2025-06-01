@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEALTSCOPEAI: Panel Interactivo del Sistema</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices: 
+    - Visión General -> Goal: Informar -> Method: Columnas con iconos (HTML/CSS) -> Interaction: Ninguna -> Justification: Presenta los 3 pilares del sistema de forma clara y visual.
+    - App Paciente: Tecnologías -> Goal: Informar -> Method: Gráfico de Donut (Chart.js) -> Interaction: Hover -> Justification: Visualiza el stack tecnológico de forma más atractiva que una lista.
+    - App Paciente: Funcionalidades -> Goal: Organizar -> Method: Tarjetas interactivas (HTML/CSS/JS) -> Interaction: Click para expandir -> Justification: Permite al usuario enfocarse en una funcionalidad a la vez, evitando una sobrecarga de información.
+    - Arquitectura: Principios -> Goal: Comparar -> Method: Gráfico de Radar (Chart.js) -> Interaction: Hover -> Justification: Ofrece una vista holística y comparativa de los principios que guían el proyecto.
+    - Seguridad -> Goal: Informar -> Method: Lista con detalles (HTML/CSS) -> Interaction: Ninguna -> Justification: Presenta los puntos clave de seguridad de forma directa y fácil de leer.
+    - Todas las elecciones evitan SVG/Mermaid y utilizan Chart.js sobre Canvas y HTML/CSS para crear una experiencia interactiva y visualmente coherente.
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { position: relative; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto; height: 300px; max-height: 350px; }
+        .radar-chart-container { position: relative; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        .tab-button.active { border-color: #3B82F6; color: #3B82F6; background-color: #EFF6FF; }
+        .feature-card.expanded .details { max-height: 500px; padding-top: 1rem; padding-bottom: 1rem; opacity: 1; }
+        .feature-card .details { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.5s ease-in-out; }
+        .feature-card .plus-icon { transition: transform 0.5s ease-in-out; }
+        .feature-card.expanded .plus-icon { transform: rotate(45deg); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">HEALTSCOPEAI</h1>
+            <p class="text-lg text-gray-600 mt-2">Un Vistazo Interactivo al Futuro de la Salud Digital</p>
+        </header>
+
+        <nav class="mb-8 flex flex-wrap justify-center gap-2 md:gap-4 border-b border-gray-200 pb-4">
+            <button data-tab="overview" class="tab-button active text-sm md:text-base font-semibold py-2 px-4 rounded-md border-2 border-transparent hover:bg-gray-100 transition-colors">Visión General</button>
+            <button data-tab="patient-app" class="tab-button text-sm md:text-base font-semibold py-2 px-4 rounded-md border-2 border-transparent hover:bg-gray-100 transition-colors">App del Paciente</button>
+            <button data-tab="doctor-platform" class="tab-button text-sm md:text-base font-semibold py-2 px-4 rounded-md border-2 border-transparent hover:bg-gray-100 transition-colors">Plataforma Médica</button>
+            <button data-tab="architecture" class="tab-button text-sm md:text-base font-semibold py-2 px-4 rounded-md border-2 border-transparent hover:bg-gray-100 transition-colors">Arquitectura y Principios</button>
+        </nav>
+
+        <main>
+            <div id="overview" class="tab-content">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold text-center mb-2 text-gray-900">Un Ecosistema de Salud Integrado</h2>
+                    <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">HEALTSCOPEAI está diseñado para revolucionar la atención médica a través de un sistema inteligente y cohesivo. Esta sección presenta los tres pilares fundamentales que componen nuestra plataforma, cada uno diseñado para interactuar de manera fluida y ofrecer una experiencia de usuario excepcional tanto para pacientes como para profesionales de la salud.</p>
+                    <div class="grid md:grid-cols-3 gap-8 text-center">
+                        <div class="flex flex-col items-center p-6 bg-blue-50 rounded-lg">
+                            <div class="text-4xl mb-4">📱</div>
+                            <h3 class="text-xl font-semibold mb-2 text-blue-800">Aplicación Móvil</h3>
+                            <p class="text-blue-700">Fomenta la adherencia al tratamiento y la fidelización del paciente con herramientas intuitivas y personalizadas.</p>
+                        </div>
+                        <div class="flex flex-col items-center p-6 bg-green-50 rounded-lg">
+                            <div class="text-4xl mb-4">🩺</div>
+                            <h3 class="text-xl font-semibold mb-2 text-green-800">Software para Médicos</h3>
+                            <p class="text-green-700">Potencia la toma de decisiones clínicas con IA para análisis de imágenes, gestión y métricas de desempeño.</p>
+                        </div>
+                        <div class="flex flex-col items-center p-6 bg-indigo-50 rounded-lg">
+                            <div class="text-4xl mb-4">🌐</div>
+                            <h3 class="text-xl font-semibold mb-2 text-indigo-800">Landing Page</h3>
+                            <p class="text-indigo-700">Actúa como el centro neurálgico para la captación de inversión, presentación del producto y acceso a prototipos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="patient-app" class="tab-content hidden">
+                 <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold text-center mb-2 text-gray-900">Aplicación del Paciente: Empoderamiento y Cuidado</h2>
+                    <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">El corazón de la experiencia del paciente es una aplicación móvil diseñada para ser un compañero de salud diario. Aquí exploramos las funcionalidades clave, desde el seguimiento de tratamientos hasta la gamificación, y la tecnología que lo hace posible. Interactúa con las tarjetas para descubrir cómo cada característica contribuye a una mejor adherencia y bienestar.</p>
+                    <div class="grid lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3 space-y-4">
+                            <div class="feature-card bg-gray-100 rounded-lg cursor-pointer" data-feature="seguimiento">
+                                <div class="flex justify-between items-center p-4">
+                                    <h3 class="font-semibold text-lg text-gray-800">Seguimiento de Tratamientos</h3>
+                                    <div class="plus-icon text-2xl text-blue-500 font-light">+</div>
+                                </div>
+                                <div class="details px-4 text-gray-700">
+                                    <ul class="list-disc list-inside space-y-2">
+                                        <li><b>Recordatorios automáticos:</b> Notificaciones para medicamentos, citas y chequeos.</li>
+                                        <li><b>Notificaciones Push:</b> Comunicados personalizados y oportunos desde Firebase.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                             <div class="feature-card bg-gray-100 rounded-lg cursor-pointer" data-feature="recomendaciones">
+                                <div class="flex justify-between items-center p-4">
+                                    <h3 class="font-semibold text-lg text-gray-800">Recomendaciones Médicas</h3>
+                                    <div class="plus-icon text-2xl text-blue-500 font-light">+</div>
+                                </div>
+                                <div class="details px-4 text-gray-700">
+                                    <ul class="list-disc list-inside space-y-2">
+                                        <li><b>Visualización de indicaciones:</b> Acceso claro a dietas, rutinas y pautas post-consulta.</li>
+                                        <li><b>Vínculo con el médico:</b> Toda la información está conectada al perfil del profesional de salud tratante.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="feature-card bg-gray-100 rounded-lg cursor-pointer" data-feature="fidelizacion">
+                                <div class="flex justify-between items-center p-4">
+                                    <h3 class="font-semibold text-lg text-gray-800">Fidelización y Gamificación</h3>
+                                    <div class="plus-icon text-2xl text-blue-500 font-light">+</div>
+                                </div>
+                                <div class="details px-4 text-gray-700">
+                                     <ul class="list-disc list-inside space-y-2">
+                                        <li><b>Sistema de puntos:</b> Recompensas por el cumplimiento de tratamientos y recomendaciones.</li>
+                                        <li><b>Motivación diaria:</b> Elementos visuales y refuerzos positivos para mantener el compromiso.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="feature-card bg-gray-100 rounded-lg cursor-pointer" data-feature="ux">
+                                <div class="flex justify-between items-center p-4">
+                                    <h3 class="font-semibold text-lg text-gray-800">Interfaz Accesible (UX Inclusiva)</h3>
+                                    <div class="plus-icon text-2xl text-blue-500 font-light">+</div>
+                                </div>
+                                <div class="details px-4 text-gray-700">
+                                     <ul class="list-disc list-inside space-y-2">
+                                        <li><b>Diseño claro y legible:</b> Tipografías, flujos intuitivos y una estética limpia.</li>
+                                        <li><b>Modo oscuro y claro:</b> Adaptabilidad a las preferencias del usuario y condiciones de luz.</li>
+                                        <li><b>Optimizado para todos:</b> Diseño usable por personas de todas las edades y habilidades tecnológicas.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2 flex flex-col items-center">
+                            <h3 class="text-xl font-semibold mb-4 text-center">Stack Tecnológico Principal</h3>
+                            <div class="chart-container w-full h-full">
+                                <canvas id="techStackChart"></canvas>
+                            </div>
+                             <div class="mt-8 text-center p-4 bg-gray-100 rounded-lg w-full">
+                                <h4 class="font-semibold text-lg mb-2">Futuro: Integración con Wearables</h4>
+                                <p class="text-sm text-gray-600">Planeamos sincronizar datos de ritmo cardíaco, pasos y sueño usando APIs como Google Fit y Apple HealthKit.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="doctor-platform" class="tab-content hidden">
+                 <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold text-center mb-2 text-gray-900">Software para Médicos: Inteligencia Clínica</h2>
+                     <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">Esta plataforma está diseñada para ser el copiloto del profesional de la salud, optimizando flujos de trabajo y mejorando la precisión diagnóstica. A continuación se describen las funcionalidades clave que integran inteligencia artificial para elevar la calidad de la atención médica y la gestión clínica.</p>
+                    <div class="max-w-2xl mx-auto mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-100 p-6 rounded-lg flex items-start gap-4">
+                            <span class="text-3xl">🧠</span>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-1">Análisis de Imágenes con IA</h3>
+                                <p class="text-gray-700">Asistencia en la interpretación de imágenes médicas para diagnósticos más rápidos y precisos.</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 p-6 rounded-lg flex items-start gap-4">
+                             <span class="text-3xl">📋</span>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-1">Gestión Clínica Eficiente</h3>
+                                <p class="text-gray-700">Herramientas para la administración de historias clínicas, citas y seguimiento de pacientes.</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 p-6 rounded-lg flex items-start gap-4">
+                             <span class="text-3xl">📈</span>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-1">Métricas de Desempeño</h3>
+                                <p class="text-gray-700">Visualización de datos clave sobre la práctica clínica para la mejora continua.</p>
+                            </div>
+                        </div>
+                         <div class="bg-gray-100 p-6 rounded-lg flex items-start gap-4">
+                             <span class="text-3xl">🔗</span>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-1">Interconexión Paciente</h3>
+                                <p class="text-gray-700">Comunicación y envío de recomendaciones directamente a la aplicación del paciente.</p>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+            
+            <div id="architecture" class="tab-content hidden">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold text-center mb-2 text-gray-900">Arquitectura y Principios Fundamentales</h2>
+                    <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">La confianza y la fiabilidad son la base de HEALTSCOPEAI. Esta sección detalla los principios de diseño y los estándares de seguridad que garantizan un sistema robusto, seguro y preparado para el futuro. El gráfico de radar visualiza cómo equilibramos estos principios, mientras que la lista de seguridad detalla nuestro compromiso con la protección de datos.</p>
+                     <div class="grid lg:grid-cols-2 gap-12 items-center">
+                        <div class="flex flex-col items-center">
+                             <h3 class="text-xl font-semibold mb-4 text-center">Principios de Diseño del Sistema</h3>
+                             <div class="radar-chart-container">
+                                <canvas id="principlesChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                             <h3 class="text-xl font-semibold mb-6 text-center">Compromiso con la Seguridad</h3>
+                             <div class="space-y-4">
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-gray-800">Cifrado de Datos (AES-256)</h4>
+                                    <p class="text-sm text-gray-600">Toda la información sensible se almacena y transmite utilizando cifrado de estándar militar.</p>
+                                </div>
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-gray-800">Cumplimiento Normativo (GDPR/HIPAA)</h4>
+                                    <p class="text-sm text-gray-600">Adhesión a los más altos estándares de privacidad y protección de datos de salud.</p>
+                                </div>
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-gray-800">Autenticación Robusta (Firebase Auth + MFA)</h4>
+                                    <p class="text-sm text-gray-600">Acceso seguro con opción de autenticación de múltiples factores para una capa extra de protección.</p>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('.tab-button');
+        const contents = document.querySelectorAll('.tab-content');
+        const featureCards = document.querySelectorAll('.feature-card');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const targetId = tab.getAttribute('data-tab');
+                contents.forEach(content => {
+                    if (content.id === targetId) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        featureCards.forEach(card => {
+            card.addEventListener('click', () => {
+                card.classList.toggle('expanded');
+            });
+        });
+
+        const techStackData = {
+            labels: ['React Native', 'Firebase'],
+            datasets: [{
+                label: 'Stack Tecnológico',
+                data: [70, 30],
+                backgroundColor: ['#3B82F6', '#FDBA74'],
+                hoverOffset: 4
+            }]
+        };
+        const techStackCtx = document.getElementById('techStackChart').getContext('2d');
+        new Chart(techStackCtx, {
+            type: 'doughnut',
+            data: techStackData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const principlesData = {
+            labels: ['Escalabilidad', 'Seguridad', 'Interoperabilidad', 'Modernidad', 'Centrado en Usuario'],
+            datasets: [{
+                label: 'Principios de Diseño',
+                data: [90, 95, 80, 85, 100],
+                fill: true,
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderColor: 'rgb(59, 130, 246)',
+                pointBackgroundColor: 'rgb(59, 130, 246)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(59, 130, 246)'
+            }]
+        };
+        const principlesCtx = document.getElementById('principlesChart').getContext('2d');
+        new Chart(principlesCtx, {
+            type: 'radar',
+            data: principlesData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            },
+                            color: '#4B5563'
+                        },
+                        ticks: {
+                           display: false,
+                           stepSize: 25
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
